@@ -92,7 +92,9 @@ Dimensions: 1024 x 1024 x 5 (Z) x 3 (Channels) x 10 (Timepoints)
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
 
 ## References
-- **Bio-Formats Library**: The Bio-Formats library is developed and maintained by Open Microscopy Environment (OME). Documentations may found [here](https://bio-formats.readthedocs.io/en/v7.3.1/developers/index.html#using-bio-formats-as-a-java-library).
+- **Bio-Formats Library**: The Bio-Formats library is developed and maintained by Open Microscopy Environment (OME). 
+    - Example documentations may found [here](https://bio-formats.readthedocs.io/en/v7.3.1/developers/index.html#using-bio-formats-as-a-java-library).
+    - Java developer [classes documentation](https://downloads.openmicroscopy.org/bio-formats/7.3.1/api/).
 - [**Calling Java from C++ with JNI**](https://www.codeproject.com/Articles/993067/Calling-Java-from-Cplusplus-with-JNI): The Java Native Interface (JNI) is a standard framework that allows C++ code to call Java code, and vice versa.
 
 ## Contributions
