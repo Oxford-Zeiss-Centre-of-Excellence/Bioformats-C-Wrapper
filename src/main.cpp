@@ -1,21 +1,57 @@
 #include <jni.h>
 #include <iostream>
+#include <filesystem>
+
+#ifdef _WIN32
+    #include <windows.h>
+#else
+    #include <unistd.h>
+#endif // _WIN32
+
+std::string getExecutableDir() {
+    char buffer[1024];
+#ifdef _WIN32
+    GetModuleFileNameA(nullptr, buffer, sizeof(buffer));
+#else
+    ssize_t len = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+    if (len != -1) {
+        buffer[len] = '\0';
+    }
+#endif
+    std::filesystem::path exePath(buffer);
+    return exePath.parent_path().string();
+}
+
 
 int main(int argc, char* argv[]) {
-    //if (argc != 2) {
-    //    std::cerr << "Usage: " << argv[0] << " <path_to_image_file>" << std::endl;
-    //    return 1;
-    //}
+    if (argc != 2) {
+        std::cerr << "Usage: " << argv[0] << " <path_to_image_file>" << std::endl;
+        return 1;
+    }
 
-    //const char* filePath = argv[1];
+    const char* filePath = argv[1];
 
-    // Path to the Java wrapper class
-    const char* classpathOption =
-        "-Djava.class.path=D:/Projects/Bioformats-C-Wrapper/build/java/BioFormatsWrapper.jar;"
-        "D:/Projects/Bioformats-C-Wrapper/build/java/bioformats_package.jar;"
-        "D:/Projects/Bioformats-C-Wrapper/build/java/bio-formats-tools.jar;"
-        "D:/Projects/Bioformats-C-Wrapper/build/java/formats-gpl.jar;"
-        "D:/Projects/Bioformats-C-Wrapper/build/java/formats-api.jar;";
+    // Get the directory of the executable
+    std::string execDir = getExecutableDir();
+
+    #ifdef _MSC_VER
+        // Construct the base path for the java directory located at one level up for MSVC build
+        std::filesystem::path javaDir = std::filesystem::path(execDir).parent_path() / "java";
+    #else
+        // If compiling with GCC or another compiler, the java directory is in the same directory as the executable
+        std::filesystem::path javaDir = std::filesystem::path(execDir) / "java";
+    #endif
+
+    // Construct the classpath using the javaDir
+    std::string classpathString =
+        "-Djava.class.path=" + javaDir.string() + "/BioFormatsWrapper.jar;" +
+        javaDir.string() + "/bioformats_package.jar;" +
+        javaDir.string() + "/bio-formats-tools.jar;" +
+        javaDir.string() + "/formats-gpl.jar;" +
+        javaDir.string() + "/formats-api.jar;";
+
+    // Convert std::string to const char*
+    const char* classpathOption = classpathString.c_str();
 
      // JNI initialization
      JavaVMOption options[1];
@@ -49,8 +85,8 @@ int main(int argc, char* argv[]) {
       jobject wrapperInstance = env->NewObject(wrapperClass, constructor);
 
       jmethodID getMetadataMethod = env->GetMethodID(wrapperClass, "getMetadata", "(Ljava/lang/String;)Ljava/lang/String;");
-      jstring filePath = env->NewStringUTF("/path/to/your/image/file");
-      jstring metadata = (jstring)env->CallObjectMethod(wrapperInstance, getMetadataMethod, filePath);
+      jstring filePathJava = env->NewStringUTF("/path/to/your/image/file");
+      jstring metadata = (jstring)env->CallObjectMethod(wrapperInstance, getMetadataMethod, filePathJava);
 
       if (metadata != nullptr) {
           const char* metadataChars = env->GetStringUTFChars(metadata, nullptr);
