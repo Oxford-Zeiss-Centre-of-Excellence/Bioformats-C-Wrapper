@@ -7,12 +7,15 @@
 
 To build and run this project, you need the following software pre-installed:
 
-- [**OpenJDK**](https://learn.microsoft.com/en-us/java/openjdk/download) (recommended Microsoft build with MSI for better MSVC compatibility. Path dependency should be able to automatically recognized by CMake)
+- [**OpenJDK**](https://learn.microsoft.com/en-us/java/openjdk/download)
+
+    Recommended Microsoft build with MSI for better MSVC compatibility. Path dependency should be able to automatically resolved by CMake if `$JAVA_HOME` environment variable is set.
+
+    **JNI Headers** should come with the JDK, but ensure they are properly referenced in your environment.
 - **CMake** (version 3.10 or later)
-- **GCC/Clang** (or another C++ compiler that supports C++17), or
-- **MSVC** (recommended for Windows users)
-- **Bio-Formats library** (download the necessary JAR files from the [Bio-Formats Github](https://github.com/ome/bioformats/releases))
-- **JNI Headers**: These should come with the JDK, but ensure they are properly referenced in your environment.
+- **C++ Compiler**
+    - **GCC/Clang**: or another C++ compiler that supports C++17, or
+    - **MSVC**: Recommended for Windows users, particularly whom would like to bridge subsequent CUDA libraries.
 
 ## Project Structure
 ```
@@ -21,7 +24,8 @@ To build and run this project, you need the following software pre-installed:
 ├── src/ 
 │ ├── BioFormatsWrapper.java 
 │ └── main.cpp 
-├── build/
+└── build/
+  └──java
 ```
 
 ## Setup and Compilation
@@ -34,9 +38,6 @@ git clone git@github.com:Oxford-Zeiss-Centre-of-Excellence/Bioformats-C-Wrapper.
 cd Bioformats-C-Wrapper
 ```
 
-### 2. Install the Bio-Formats Library
-Download the Bio-Formats library JAR files and place them in the src directory or any location of your choice. Run CMake configuration to point to the correct path where these JAR files are stored.
-
 ### 3. CMake Configuration and Build
 #### GUI Build
 1. Create `build` folder under the project root
@@ -44,11 +45,8 @@ Download the Bio-Formats library JAR files and place them in the src directory o
     ![](./doc/imgs/cmake_config.png "CMake Config")
     1. Select The project root
     2. Select the `build` folder created in previous step
-    3. Check `Advanced` to display all dependency entries, then set the following paths accordingly to your system.
-    ```
-
-    ```
-    4. Run configure
+    3. Check `Advanced` will display all dependency entries. (Optional for custom path settings)
+    4. Run configure 
     5. Run Generate
 3. Open the project in MSVC/VSCode and compile.
 
@@ -69,7 +67,7 @@ make # compiles both the Java and C++ components and links them using JNI.
 The application takes a single command-line argument: the file path of the image file you want to read.
 
 ```bash
-./BioFormatsImageReader /path/to/your/image.czi
+./BioFormatsWrapper_Example /path/to/your/image.czi
 ```
 
 The program will output metadata about the image, such as its dimensions, number of channels, and timepoints:
@@ -93,12 +91,12 @@ Dimensions: 1024 x 1024 x 5 (Z) x 3 (Channels) x 10 (Timepoints)
 ## License
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
 
-## Credits
-- **Bio-Formats Library**: The Bio-Formats library is developed and maintained by Open Microscopy Environment (OME).
-- **JNI**: The Java Native Interface (JNI) is a standard framework that allows C++ code to call Java code, and vice versa.
+## References
+- **Bio-Formats Library**: The Bio-Formats library is developed and maintained by Open Microscopy Environment (OME). Documentations may found [here](https://bio-formats.readthedocs.io/en/v7.3.1/developers/index.html#using-bio-formats-as-a-java-library).
+- [**Calling Java from C++ with JNI**](https://www.codeproject.com/Articles/993067/Calling-Java-from-Cplusplus-with-JNI): The Java Native Interface (JNI) is a standard framework that allows C++ code to call Java code, and vice versa.
 
 ## Contributions
 Contributions are welcome! Feel free to open issues or submit pull requests if you have suggestions for improvements or bug fixes.
 
 ## Contact
-For questions or support, please contact [ka.ko@kennedy.ox.ac.uk].
+For questions or support, please contact [ka.ko@kennedy.ox.ac.uk](mailto:ka.ko@kennedy.ox.ac.uk).
